@@ -1,0 +1,72 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Exercise {
+  createdAt       DateTime     @default(now())
+  description     String?
+  difficultyLevel String?
+  id              String       @id @default(cuid())
+  language        String?
+  lesson          Lesson?      @relation(fields: [lessonId], references: [id])
+  lessonId        String?
+  submissions     Submission[]
+  title           String?
+  updatedAt       DateTime     @updatedAt
+}
+
+model Lesson {
+  content   String?
+  course    Course?    @relation(fields: [courseId], references: [id])
+  courseId  String?
+  createdAt DateTime   @default(now())
+  exercises Exercise[]
+  id        String     @id @default(cuid())
+  order     Int?
+  title     String?
+  updatedAt DateTime   @updatedAt
+}
+
+model Course {
+  category        String?
+  createdAt       DateTime @default(now())
+  description     String?
+  difficultyLevel String?
+  id              String   @id @default(cuid())
+  lessons         Lesson[]
+  title           String?
+  updatedAt       DateTime @updatedAt
+}
+
+model Submission {
+  code        String?
+  createdAt   DateTime  @default(now())
+  exercise    Exercise? @relation(fields: [exerciseId], references: [id])
+  exerciseId  String?
+  id          String    @id @default(cuid())
+  score       Float?
+  status      String?
+  submittedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+model User {
+  createdAt   DateTime     @default(now())
+  email       String?      @unique
+  firstName   String?
+  id          String       @id @default(cuid())
+  lastName    String?
+  password    String
+  role        String?
+  roles       Json
+  submissions Submission[]
+  updatedAt   DateTime     @updatedAt
+  username    String       @unique
+}
